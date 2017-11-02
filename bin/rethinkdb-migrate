@@ -12,10 +12,16 @@ internals.createOptions = {
   },
   relativeTo: {
     describe: 'Root path from which migration directory will be searched'
+  },
+  extension: {
+    describe: 'Extension of the migration file which will be saved'
   }
 }
 
 internals.migrateOptions = Object.assign({}, internals.createOptions, {
+  to: {
+    describe: 'The migration name to migrate down or to. If not found, no migration will be applied'
+  },
   driver: {
     describe: 'RethinkDB javascript driver. Can be either rethinkdb or rethinkdbdash. Defaults to rethinkdb, the official driver'
   },
@@ -85,7 +91,7 @@ require('yargs')
 logger(Migrations.migrate.emitter)
 
 function runCreate (argv) {
-  const options = Mask(buildOptions(argv), 'name,migrationsDirectory,relativeTo')
+  const options = Mask(buildOptions(argv), 'name,migrationsDirectory,relativeTo,extension')
 
   Migrations.create(options)
     .then(() => console.log('Finished successfully'))
@@ -115,7 +121,7 @@ function logger (emitter) {
  * an option present in the config file and also a environment variable, and so on
  */
 function buildOptions (argv) {
-  const optionsMask = 'name,migrationsDirectory,relativeTo,migrationsTable,host,port,db,user,username,password,authKey,driver,discovery,pool,cursor,servers,ssl,i,ignoreTimestamp'
+  const optionsMask = 'name,migrationsDirectory,relativeTo,migrationsTable,host,port,db,user,username,password,authKey,driver,discovery,pool,cursor,servers,ssl,i,ignoreTimestamp,to'
   const envVars = Mask(process.env, optionsMask)
   const file = Mask(readOptionsFile(argv), optionsMask)
   const args = Mask(argv, optionsMask)
